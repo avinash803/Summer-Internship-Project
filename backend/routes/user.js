@@ -1,6 +1,7 @@
-const router = require('express').Router();
+const express = require('express');
+const router = express.Router();
 const User = require('../models/user');
-
+const bcrypt = require('bcrypt');
 // sign-up functionality
 
 router.post('/sign-up', async (req, res) => {
@@ -33,12 +34,12 @@ router.post('/sign-up', async (req, res) => {
         else if (password.length < 6) {
             return res.status(400).json({ message: "Password should be at least 6 characters" });
         }
-
+        const haspassword = bcrypt.hashSync(password, 10);
         // Create new user
         const newUser = new User({
             username: username,
             email: email,
-            password: password,
+            password: haspassword,
             address: address,
         });
 
