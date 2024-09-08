@@ -82,4 +82,41 @@ router.delete('/delete-book', authenticatetoken, async (req, res) => {
     }
 });
 
+router.get('/get-all-books', async (req, res) => {
+    try {
+        const books = await Book.find().sort({ createdAt: -1 });
+        res.status(200).json({
+            status: 'success',
+            data: books
+        });
+    } catch (error) {
+        res.status(500).json({ message: "Internal Server Error" });
+    }
+});
+
+router.get('/get-recent-books', async (req, res) => {
+    try {
+        const books = await Book.find().sort({ createdAt: -1 }).limit(5);
+        res.status(200).json({
+            status: 'success',
+            data: books
+        });
+    } catch (error) {
+        res.status(500).json({ message: "Internal Server Error" });
+    }
+});
+
+
+router.get('/get-book-by-id', async (req, res) => {
+    try {
+        const {id} = req.params;
+        const book = await Book.findById(id);
+        return res.json({
+            status: 'success',
+            data: book,
+        });
+    } catch (error) {
+        res.status(500).json({ message: "Internal Server Error" });
+    }
+});
 module.exports = router;
