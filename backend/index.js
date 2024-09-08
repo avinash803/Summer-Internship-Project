@@ -2,7 +2,7 @@ const express = require('express');
 const app = express();
 require('dotenv').config();
 require('./conn');
-const User = require('./routes/user');
+const userRoutes = require('./routes/user');
 
 // Middleware to handle JSON parsing errors
 app.use((err, req, res, next) => {
@@ -17,9 +17,9 @@ app.get('/', (res) => {
 });
 
 app.use(express.json());
-app.use('/api/v1', User);
+app.use('/api/v1',userRoutes);
 
 app.listen(process.env.PORT, () => {
-    console.log('Server is running on port 3000');
+    console.log(`Server is running on port ${process.env.PORT}`)
 });
 

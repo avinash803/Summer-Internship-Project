@@ -2,7 +2,8 @@ const express = require('express');
 const router = express.Router();
 const User = require('../models/user');
 const bcrypt = require('bcrypt');
-// sign-up functionality
+const jwt = require('jsonwebtoken');
+
 
 router.post('/sign-up', async (req, res) => {
     try {
@@ -50,7 +51,40 @@ router.post('/sign-up', async (req, res) => {
     }
 });
 
+router.post('/sign-in', async (req, res) => {
+    try {
+        const { username, password } = req.body;
 
-// login functionality
+        // Check for empty fields
+        if (!username || !password) {
+            return res.status(400).json({ message: "All input is required" });
+        }
+
+        // Check for existing username
+        const existinguser = await User.findOne({ username: username });
+        if (!existinguser) {
+            return res.status(400).json({ message: "Invalid credentials" });
+        }
+
+        const result = await bcrypt.compare(password, existinguser.password);
+        if (result) {
+            const authclaims = [
+                { username: existinguser.username },
+                { role: existinguser.role }
+            ];
+            const token = jwt.sign({ authclaims }, process.env.JWT_SECRET, { expiresIn: '60d' });
+            return res.status(200).json({
+                id: existinguser._id,
+                username: existinguser.username,
+                role: existinguser.role,
+                token: token
+            });
+        } else {
+            return res.status(400).json({ message: "Invalid credentials" });
+        }
+    } catch (error) {
+        res.status(500).json({ message: "Internal Server Error" });
+    }
+});
 
 module.exports = router;
