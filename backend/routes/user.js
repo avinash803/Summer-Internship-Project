@@ -98,4 +98,15 @@ router.get('/get-user', authenticatetoken, async (req, res) => {
     }
 });
 
+router.put('/update-user', authenticatetoken, async (req, res) => {
+    try {
+        const { id } = req.headers;
+        const { address } = req.body;
+        await User.findByIdAndUpdate(id, { address: address });
+        res.status(200).json({ message: "User updated successfully" });
+    } catch (error) {
+        res.status(500).json({ message: "Internal Server Error" });
+    }
+});
+
 module.exports = router;
