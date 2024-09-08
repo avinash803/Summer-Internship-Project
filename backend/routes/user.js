@@ -3,7 +3,7 @@ const router = express.Router();
 const User = require('../models/user');
 const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
-
+const {authenticatetoken} = require('./userAuth');
 
 router.post('/sign-up', async (req, res) => {
     try {
@@ -82,6 +82,17 @@ router.post('/sign-in', async (req, res) => {
         } else {
             return res.status(400).json({ message: "Invalid credentials" });
         }
+    } catch (error) {
+        res.status(500).json({ message: "Internal Server Error" });
+    }
+});
+
+
+router.get('/get-user', authenticatetoken, async (req, res) => {
+    try {
+        const {id} = req.headers; 
+        const data = await User.findById(id);
+        res.status(200).json(data); 
     } catch (error) {
         res.status(500).json({ message: "Internal Server Error" });
     }
